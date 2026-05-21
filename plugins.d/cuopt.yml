@@ -1,0 +1,45 @@
+name: cuopt
+
+description: GPU-accelerated optimization with NVIDIA cuOpt — vehicle routing, linear programming, mixed-integer programming, and quadratic programming.
+
+display_name: NVIDIA cuOpt
+short_description: GPU-accelerated optimization for routing, LP, MILP, and QP.
+long_description: A curated plugin bundling verified NVIDIA cuOpt skills for vehicle routing (VRP, TSP, PDP), linear programming, mixed-integer programming, and quadratic programming — including formulation guidance, Python/C/CLI APIs, REST server deployment, installation, and contributor workflows.
+
+category: Developer Tools
+
+keywords:
+  - nvidia
+  - cuopt
+  - optimization
+  - agent-skills
+  - gpu
+  - lp
+  - milp
+  - qp
+  - vrp
+  - routing
+
+default_prompts:
+  - "Solve a linear or mixed-integer program with cuOpt."
+  - "Build a vehicle routing solution with cuOpt."
+  - "Deploy the cuOpt REST server and call it from Python."
+
+# Skills are materialized into plugins/cuopt/skills/<skill>/ by the build script.
+# Each entry can be either:
+#   - a directory ending in /  → expand to all immediate subdirs that contain SKILL.md
+#   - a specific skill dir     → copy as one skill (basename becomes the dir name)
+include_skills:
+  - skills/cuopt/
+
+# Optional codex interface assets — uncomment when assets land under plugins/cuopt/assets/.
+# logo: ./assets/cuopt.png
+# composer_icon: ./assets/cuopt.png
+# screenshots:
+#   - ./assets/screenshot-1.png
+#   - ./assets/screenshot-2.png
+
+# Inherits from plugins.d/_defaults.yml:
+#   version, author, homepage, repository, license,
+#   website_url, privacy_policy_url, terms_of_service_url,
+#   brand_color, capabilities

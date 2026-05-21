@@ -1,0 +1,44 @@
+{
+    "name": "nvidia-curated",
+    "interface": {
+        "displayName": "NVIDIA official"
+    },
+    "plugins": [
+        {
+            "name": "cuopt",
+            "source": {
+                "source": "local",
+                "path": "./plugins/cuopt"
+            },
+            "policy": {
+                "installation": "AVAILABLE",
+                "authentication": "ON_INSTALL"
+            },
+            "category": "Developer Tools"
+        },
+        {
+            "name": "nemoclaw",
+            "source": {
+                "source": "local",
+                "path": "./plugins/nemoclaw"
+            },
+            "policy": {
+                "installation": "AVAILABLE",
+                "authentication": "ON_INSTALL"
+            },
+            "category": "Developer Tools"
+        },
+        {
+            "name": "physical-ai",
+            "source": {
+                "source": "local",
+                "path": "./plugins/physical-ai"
+            },
+            "policy": {
+                "installation": "AVAILABLE",
+                "authentication": "ON_INSTALL"
+            },
+            "category": "Developer Tools"
+        }
+    ]
+}

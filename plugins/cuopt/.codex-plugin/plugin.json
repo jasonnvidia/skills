@@ -1,0 +1,45 @@
+{
+    "name": "cuopt",
+    "version": "1.0.0",
+    "description": "GPU-accelerated optimization with NVIDIA cuOpt — vehicle routing, linear programming, mixed-integer programming, and quadratic programming.",
+    "author": {
+        "name": "NVIDIA",
+        "url": "https://github.com/NVIDIA/skills"
+    },
+    "homepage": "https://github.com/NVIDIA/skills",
+    "repository": "https://github.com/NVIDIA/skills",
+    "license": "Apache-2.0 AND CC-BY-4.0",
+    "keywords": [
+        "nvidia",
+        "cuopt",
+        "optimization",
+        "agent-skills",
+        "gpu",
+        "lp",
+        "milp",
+        "qp",
+        "vrp",
+        "routing"
+    ],
+    "skills": "./skills/",
+    "interface": {
+        "displayName": "NVIDIA cuOpt",
+        "shortDescription": "GPU-accelerated optimization for routing, LP, MILP, and QP.",
+        "longDescription": "A curated plugin bundling verified NVIDIA cuOpt skills for vehicle routing (VRP, TSP, PDP), linear programming, mixed-integer programming, and quadratic programming — including formulation guidance, Python/C/CLI APIs, REST server deployment, installation, and contributor workflows.",
+        "developerName": "NVIDIA",
+        "category": "Developer Tools",
+        "capabilities": [
+            "Interactive",
+            "Write"
+        ],
+        "websiteURL": "https://build.nvidia.com/skills",
+        "privacyPolicyURL": "https://www.nvidia.com/en-us/about-nvidia/privacy-center/",
+        "termsOfServiceURL": "https://assets.ngc.nvidia.com/products/api-catalog/legal/NVIDIA_Technology_Access_TOU.pdf",
+        "brandColor": "#76b900",
+        "defaultPrompt": [
+            "Solve a linear or mixed-integer program with cuOpt.",
+            "Build a vehicle routing solution with cuOpt.",
+            "Deploy the cuOpt REST server and call it from Python."
+        ]
+    }
+}

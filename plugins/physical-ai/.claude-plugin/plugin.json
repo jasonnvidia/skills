@@ -1,0 +1,23 @@
+{
+    "name": "physical-ai",
+    "version": "1.0.0",
+    "description": "Physical AI workflows for video analytics and perception — Video Search and Summarization (VSS) plus DeepStream — to deploy, search, summarize, alert, and report over real-world video.",
+    "author": {
+        "name": "NVIDIA",
+        "url": "https://github.com/NVIDIA/skills"
+    },
+    "homepage": "https://github.com/NVIDIA/skills",
+    "license": "Apache-2.0 AND CC-BY-4.0",
+    "keywords": [
+        "nvidia",
+        "physical-ai",
+        "vss",
+        "video-search-and-summarization",
+        "deepstream",
+        "video-analytics",
+        "perception",
+        "edge",
+        "rtsp",
+        "sensor"
+    ]
+}

@@ -1,0 +1,43 @@
+name: nvidia
+
+description: Build with NVIDIA agent skills.
+
+display_name: NVIDIA
+short_description: Provide agentic guidance in your NVIDIA related workflows.
+long_description: A curated plugin bundling verified skills to provide guidance in your NVIDIA related workflows.
+
+category: Developer Tools
+logo: ./assets/nvidia.png
+composer_icon: ./assets/nvidia.png
+# screenshots: []   # optional; supply ./assets/*.png paths when we have any
+
+keywords:
+  - nvidia
+  - agent-skills
+  - gpu
+
+default_prompts:
+  - "Solve an optimization problem with cuOpt."
+  - "Deploy or debug an NVIDIA RAG Blueprint."
+  - "Search a video archive with VSS."
+
+# Curated subset of skills, packaged for delivery to upstream
+# OpenAI Bundled / Anthropic Official marketplaces.
+include_skills:
+  - skills/cuopt/cuopt-numerical-optimization-api-python/
+  - skills/cuopt/cuopt-install/
+  - skills/NemoClaw/nemoclaw-user-get-started/
+
+# Inherits from plugins.d/_defaults.yml:
+#   version, author, homepage, repository, license,
+#   website_url, privacy_policy_url, terms_of_service_url,
+#   brand_color, capabilities
+
+# ------------------------------------------------------------------------------
+# WHAT IS THIS?
+#    nvidia plugin is not added into either of the local/self-hosted nvidia/skills marketplace.json config
+# WHY? 
+#   the plugin folder "nvidia" is used to hand-deliver to the external OpenAI and Anthropic marketplaces.
+marketplace_enabled:
+  claude: false
+  codex: false

@@ -218,6 +218,14 @@ jobs:
       - name: Regenerate README tables
         run: .github/scripts/regenerate-readme.sh
 
+      - name: Build plugin tree
+        # Materializes plugins/<name>/ from plugins.d/*.yml against the
+        # freshly-synced skills/ tree, and refreshes plugin entries in both
+        # marketplace.json files. Runs after the sync so plugins always
+        # reflect the latest synced skills, and before the auto-PR step so
+        # the generated tree is included in the same PR.
+        run: .github/scripts/build-plugins.sh
+
       - name: Build sync summary
         id: summary
         run: |

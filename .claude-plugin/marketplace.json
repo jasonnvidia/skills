@@ -1,0 +1,24 @@
+{
+    "name": "nvidia-curated",
+    "description": "Curated NVIDIA agent-skill plugins for Claude Code — GPU-accelerated tooling and workflows for NVIDIA SDKs.",
+    "owner": {
+        "name": "NVIDIA Official"
+    },
+    "plugins": [
+        {
+            "name": "cuopt",
+            "source": "./plugins/cuopt",
+            "description": "GPU-accelerated optimization with NVIDIA cuOpt — vehicle routing, linear programming, mixed-integer programming, and quadratic programming."
+        },
+        {
+            "name": "nemoclaw",
+            "source": "./plugins/nemoclaw",
+            "description": "NemoClaw user workflows — install, configure, deploy, and operate NemoClaw sandboxes for agentic AI with policy, security, inference, and monitoring controls."
+        },
+        {
+            "name": "physical-ai",
+            "source": "./plugins/physical-ai",
+            "description": "Physical AI workflows for video analytics and perception — Video Search and Summarization (VSS) plus DeepStream — to deploy, search, summarize, alert, and report over real-world video."
+        }
+    ]
+}
