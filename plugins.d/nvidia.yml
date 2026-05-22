@@ -30,14 +30,12 @@ include_skills:
 
 # Inherits from plugins.d/_defaults.yml:
 #   version, author, homepage, repository, license,
-#   website_url, privacy_policy_url, terms_of_service_url,
 #   brand_color, capabilities
 
-# ------------------------------------------------------------------------------
-# WHAT IS THIS?
-#    nvidia plugin is not added into either of the local/self-hosted nvidia/skills marketplace.json config
-# WHY? 
-#   the plugin folder "nvidia" is used to hand-deliver to the external OpenAI and Anthropic marketplaces.
-marketplace_enabled:
-  claude: false
-  codex: false
+# Published in both self-hosted marketplace.json files (default behaviour).
+# The same plugins/nvidia/ tree is also hand-delivered to the external
+# OpenAI and Anthropic marketplaces — the local publish is additive, not a
+# substitute for the upstream submissions.
+# marketplace_enabled:
+#   claude: false
+#   codex: false

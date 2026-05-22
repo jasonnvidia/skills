@@ -27,6 +27,8 @@ The CLI runs through `npx` and prompts you to choose a skill and install destina
 
 The skill is available the next time your agent loads skills and encounters a relevant task. For example, ask your agent to "solve a linear programming problem with cuOpt" and the skill guides it through the cuOpt Python API.
 
+> **Default scope vs. full catalog.** The bare command above lists the **curated NVIDIA plugin** — the same 3-skill bundle published to the OpenAI and Anthropic plugin marketplaces (`cuopt-install`, `cuopt-numerical-optimization-api-python`, `nemoclaw-user-get-started`). To install any of the additional skills shown in the [Skill Catalog](#skill-catalog) below, append `--full-depth` so the CLI also walks the nested `skills/<Product>/<skill>/` tree. See [Install Any Skill from the Full Catalog](#install-any-skill-from-the-full-catalog).
+
 ### Install One Skill Without Prompts
 
 Use this when you already know the skill name and want to skip prompts.
@@ -35,7 +37,25 @@ Use this when you already know the skill name and want to skip prompts.
 npx skills add nvidia/skills --skill cuopt-numerical-optimization-api-python --yes
 ```
 
-Replace `cuopt-numerical-optimization-api-python` with any skill name from the [Skill Catalog](#skill-catalog).
+This works as-is for the three curated skills listed above. For any other skill from the [Skill Catalog](#skill-catalog), add `--full-depth` (see [next section](#install-any-skill-from-the-full-catalog)).
+
+### Install Any Skill from the Full Catalog
+
+The catalog table below lists every NVIDIA skill mirrored into this repo. To install one, point the CLI at the full tree with `--full-depth`:
+
+```bash
+npx skills add nvidia/skills --skill <skill-name> --yes --full-depth
+```
+
+For example:
+
+```bash
+npx skills add nvidia/skills --skill cudaq-guide --yes --full-depth
+npx skills add nvidia/skills --skill perf-cuda-graphs --yes --full-depth
+npx skills add nvidia/skills --skill rag-blueprint --yes --full-depth
+```
+
+Replace `<skill-name>` with any skill name from the [Skill Catalog](#skill-catalog).
 
 ### Install for a Specific Agent
 
@@ -80,8 +100,16 @@ npx skills add nvidia/skills \
 
 Use this when you want to see available NVIDIA skills before installing anything.
 
+List the curated plugin's 3 skills:
+
 ```bash
 npx skills add nvidia/skills --list
+```
+
+List every skill in the catalog (matches the table below):
+
+```bash
+npx skills add nvidia/skills --list --full-depth
 ```
 
 For non-interactive installs, global installs, agent-specific installs, updates, removals, and fallback manual copying, see [Advanced installation](docs/advanced-install.mdx).

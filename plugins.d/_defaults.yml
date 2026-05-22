@@ -18,9 +18,16 @@ homepage: https://github.com/NVIDIA/skills
 repository: https://github.com/NVIDIA/skills
 license: Apache-2.0 AND CC-BY-4.0
 
-website_url: https://build.nvidia.com/skills
-privacy_policy_url: https://www.nvidia.com/en-us/about-nvidia/privacy-center/
-terms_of_service_url: https://assets.ngc.nvidia.com/products/api-catalog/legal/NVIDIA_Technology_Access_TOU.pdf
+# interface.websiteURL is omitted by default — duplicates `homepage` for
+# plugins that don't have a distinct product/marketing page. Set it per
+# plugin only when there is a real landing page to link to.
+# website_url: https://github.com/NVIDIA/skills
+
+# Privacy policy / Terms of service URLs are only required when a plugin
+# actually collects user data or imposes plugin-specific terms. Leave them
+# unset by default; uncomment and override per plugin when applicable.
+# privacy_policy_url: https://www.nvidia.com/en-us/about-nvidia/privacy-center/
+# terms_of_service_url: https://developer.nvidia.com/legal/terms
 
 brand_color: "#76b900"
 

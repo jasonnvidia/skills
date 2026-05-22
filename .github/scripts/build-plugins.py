@@ -219,12 +219,18 @@ def render_codex_plugin_json(spec: dict[str, Any]) -> dict[str, Any]:
         interface["category"] = spec["category"]
     if "capabilities" in spec:
         interface["capabilities"] = list(spec["capabilities"])
-    if "website_url" in spec:
-        interface["websiteURL"] = spec["website_url"]
-    if "privacy_policy_url" in spec:
-        interface["privacyPolicyURL"] = spec["privacy_policy_url"]
-    if "terms_of_service_url" in spec:
-        interface["termsOfServiceURL"] = spec["terms_of_service_url"]
+    # Optional URL fields. Empty-string and null values are treated as
+    # "explicitly unset" so a plugin can override the defaults to drop a
+    # field entirely (e.g. `privacy_policy_url: ""` in plugin yaml).
+    for src_key, dst_key in (
+        ("website_url", "websiteURL"),
+        ("privacy_policy_url", "privacyPolicyURL"),
+        ("terms_of_service_url", "termsOfServiceURL"),
+    ):
+        value = spec.get(src_key)
+        if value is None or value == "":
+            continue
+        interface[dst_key] = value
     if "logo" in spec:
         interface["logo"] = spec["logo"]
     if "composer_icon" in spec:
@@ -302,12 +308,16 @@ def is_marketplace_enabled(spec: dict[str, Any], marketplace_key: str) -> bool:
     return bool(flags.get(marketplace_key, True))
 
 
-def upsert_claude_marketplace(catalog_specs: dict[str, dict[str, Any]]) -> None:
+def upsert_claude_marketplace(
+    catalog_specs: dict[str, dict[str, Any]],
+    curated_names: set[str],
+) -> None:
     """
     Rebuild plugin entries in .claude-plugin/marketplace.json:
       - Catalog plugins with marketplace_enabled.claude == true → present
       - Catalog plugins with marketplace_enabled.claude == false → removed
-      - Plugins not in plugins.d/ at all → preserved as-is
+      - Curated plugins (have plugins/<name>/.skills-manifest.yml) → preserved as-is
+      - Anything else (orphaned entries from deleted plugins) → removed
     """
     if not CLAUDE_MARKETPLACE.is_file():
         die(f"missing {CLAUDE_MARKETPLACE.relative_to(REPO_ROOT)}")
@@ -317,8 +327,12 @@ def upsert_claude_marketplace(catalog_specs: dict[str, dict[str, Any]]) -> None:
 
     new_plugins: list[dict[str, Any]] = []
     for entry in existing:
-        if entry.get("name") not in managed:
-            new_plugins.append(entry)
+        name = entry.get("name")
+        if name in managed:
+            continue  # rebuilt below
+        if name in curated_names:
+            new_plugins.append(entry)  # hand-maintained — preserve verbatim
+        # else: orphan — drop silently
     for name in sorted(catalog_specs):
         spec = catalog_specs[name]
         if not is_marketplace_enabled(spec, "claude"):
@@ -334,7 +348,10 @@ def upsert_claude_marketplace(catalog_specs: dict[str, dict[str, Any]]) -> None:
     log(f"  ✓ {CLAUDE_MARKETPLACE.relative_to(REPO_ROOT)} ({len(new_plugins)} plugin(s))")
 
 
-def upsert_agents_marketplace(catalog_specs: dict[str, dict[str, Any]]) -> None:
+def upsert_agents_marketplace(
+    catalog_specs: dict[str, dict[str, Any]],
+    curated_names: set[str],
+) -> None:
     """Same shape as Claude marketplace, but driven by marketplace_enabled.codex."""
     if not AGENTS_MARKETPLACE.is_file():
         die(f"missing {AGENTS_MARKETPLACE.relative_to(REPO_ROOT)}")
@@ -344,8 +361,12 @@ def upsert_agents_marketplace(catalog_specs: dict[str, dict[str, Any]]) -> None:
 
     new_plugins: list[dict[str, Any]] = []
     for entry in existing:
-        if entry.get("name") not in managed:
-            new_plugins.append(entry)
+        name = entry.get("name")
+        if name in managed:
+            continue  # rebuilt below
+        if name in curated_names:
+            new_plugins.append(entry)  # hand-maintained — preserve verbatim
+        # else: orphan — drop silently
     for name in sorted(catalog_specs):
         spec = catalog_specs[name]
         if not is_marketplace_enabled(spec, "codex"):
@@ -434,8 +455,9 @@ def main(argv: list[str]) -> int:
         build_curated_plugin(plugin_dir)
 
     log("── marketplaces ──")
-    upsert_claude_marketplace(catalog)
-    upsert_agents_marketplace(catalog)
+    curated_names = {d.name for d in curated}
+    upsert_claude_marketplace(catalog, curated_names)
+    upsert_agents_marketplace(catalog, curated_names)
 
     if args.check:
         log("── drift check ──")

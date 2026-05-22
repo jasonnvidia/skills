@@ -25,9 +25,6 @@
             "Interactive",
             "Write"
         ],
-        "websiteURL": "https://build.nvidia.com/skills",
-        "privacyPolicyURL": "https://www.nvidia.com/en-us/about-nvidia/privacy-center/",
-        "termsOfServiceURL": "https://assets.ngc.nvidia.com/products/api-catalog/legal/NVIDIA_Technology_Access_TOU.pdf",
         "logo": "./assets/nvidia.png",
         "composerIcon": "./assets/nvidia.png",
         "brandColor": "#76b900",
