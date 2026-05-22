@@ -27,8 +27,6 @@ The CLI runs through `npx` and prompts you to choose a skill and install destina
 
 The skill is available the next time your agent loads skills and encounters a relevant task. For example, ask your agent to "solve a linear programming problem with cuOpt" and the skill guides it through the cuOpt Python API.
 
-> **Why `--full-depth`?** The named-skill examples below all pass `--full-depth` so the CLI walks the full `skills/<Product>/<skill>/` tree. This guarantees the command works for any skill in the [Skill Catalog](#skill-catalog), regardless of which skills happen to be bundled in the curated NVIDIA plugin (the small subset published to the OpenAI and Anthropic plugin marketplaces). The bare `npx skills add nvidia/skills` shown above intentionally omits the flag — that flow is what users see when they install the curated plugin from those marketplaces, and we keep it as-is here for parity.
-
 ### Install One Skill Without Prompts
 
 Use this when you already know the skill name and want to skip prompts.
@@ -88,14 +86,6 @@ npx skills add nvidia/skills \
 ### Browse the Catalog
 
 Use this when you want to see available NVIDIA skills before installing anything.
-
-List the curated plugin's 3 skills:
-
-```bash
-npx skills add nvidia/skills --list
-```
-
-List every skill in the catalog (matches the table below):
 
 ```bash
 npx skills add nvidia/skills --list --full-depth
@@ -176,45 +166,57 @@ For issues with **this catalog repo itself** (README, structure, listing a new p
 
 ```
 NVIDIA/skills/
-├── skills/                  # All skills, mirrored daily from product repos
-│   ├── README.md             # Install guidance for people browsing this folder directly
-│   ├── CUDA-Q/               # CUDA-Q skills
-│   ├── cuopt/                # cuOpt skills
-│   ├── Megatron-Bridge/      # Megatron-Bridge skills
-│   ├── Megatron-Core/        # Megatron-Core skills
-│   ├── Model-Optimizer/      # Model-Optimizer skills
-│   ├── NeMo-Evaluator/       # NeMo Evaluator skills
-│   ├── NeMo-Evaluator-Launcher/
-│   ├── NeMo-Gym/             # NeMo Gym skills 
-│   ├── NemoClaw/             # NemoClaw skills 
-│   ├── nemotron-voice-agent/ # Nemotron Voice Agent skills
-│   ├── TensorRT-LLM/         # TensorRT-LLM skills 
+├── skills/                       # All skills, mirrored daily from product repos
+│   ├── README.md                  # Install guidance for people browsing this folder directly
+│   ├── CUDA-Q/                    # CUDA-Q skills
+│   ├── cuopt/                     # cuOpt skills
+│   ├── Megatron-Bridge/           # Megatron-Bridge skills
+│   ├── Megatron-Core/             # Megatron-Core skills
 │   └── ...
-├── components.d/            # Product registry — one file per component, teams onboard here
+├── components.d/                 # Product registry — one file per component, teams onboard here
+│   ├── README.md                  # Schema and onboarding instructions
 │   ├── cuda-q.yml
 │   ├── cuopt.yml
 │   ├── megatron-bridge.yml
 │   ├── ...
-│   ├── tensorrt-llm.yml
-│   └── README.md             # Schema and onboarding instructions
-├── docs/                    # Long-form documentation (published via Fern)
-│   ├── README.md             # How to build the docs locally
+│   └── tensorrt-llm.yml
+├── plugins.d/                    # Plugin registry — one file per packaged plugin
+│   ├── README.md                  # Schema and authoring instructions
+│   ├── _defaults.yml              # Defaults inherited by every plugin (license, author, etc.)
+│   └── nvidia.yml                 # Curated NVIDIA plugin definition (skills + metadata)
+├── plugins/                      # Materialized plugin trees (generated from plugins.d/)
+│   └── nvidia/
+│       ├── .claude-plugin/        # Anthropic plugin manifest (plugin.json)
+│       ├── .codex-plugin/         # OpenAI Codex plugin manifest (plugin.json)
+│       ├── README.md
+│       ├── assets/                # Logo and other plugin assets
+│       └── skills/                # Curated subset copied from skills/
+├── .claude-plugin/               # Anthropic local marketplace (this repo as a plugin source)
+│   └── marketplace.json
+├── .agents/plugins/              # OpenAI Codex local marketplace
+│   └── marketplace.json
+├── docs/                         # Long-form documentation (published via Fern)
+│   ├── README.md                  # How to build the docs locally
 │   ├── index.mdx
-│   ├── advanced-install.mdx  # Advanced skills CLI usage
-│   ├── agent-skill-trust-pipeline.mdx
-│   ├── release-checklist.mdx
-│   ├── scanning-agent-skills.mdx
-│   ├── signing-agent-skills.mdx
-│   └── skill-cards.mdx
-├── fern/                    # Fern docs site configuration
-├── .github/workflows/       # Automated sync pipeline
-├── CONTRIBUTING.md          # Contribution guidelines
-├── SECURITY.md              # Security reporting policy
-├── CODE_OF_CONDUCT.md       # Community code of conduct
-└── LICENSE                  # Apache 2.0
+│   ├── ...
+├── fern/                         # Fern docs site configuration
+├── .github/
+│   ├── workflows/                 # Automated sync, validation, and CI pipelines
+│   │   ├── sync-skills.yml         # Daily mirror from product repos into skills/
+│   │   ├── validate-plugins.yml    # PR validation for plugins/ and marketplaces
+│   │   └── ...
+│   └── scripts/
+│       ├── build-plugins.sh        # Regenerate plugins/ + marketplace manifests
+│       ├── build-plugins.py        # Implementation called by build-plugins.sh
+│       └── regenerate-readme.sh    # Refresh the Skill Catalog tables in this README
+├── CHANGELOG.md
+├── CONTRIBUTING.md               # Contribution guidelines
+├── SECURITY.md                   # Security reporting policy
+├── CODE_OF_CONDUCT.md            # Community code of conduct
+└── LICENSE                       # Apache 2.0
 ```
 
-Skills are maintained in their respective product repos (see the **Source** column in the [Skill Catalog](#skill-catalog)) and automatically synced to this repo daily.
+Skills are maintained in their respective product repos (see the **Source** column in the [Skill Catalog](#skill-catalog)) and automatically synced to this repo daily. The `plugins/` tree, `.claude-plugin/marketplace.json`, and `.agents/plugins/marketplace.json` are all generated from `plugins.d/` by `.github/scripts/build-plugins.sh` — don't edit them by hand.
 
 ---
 
