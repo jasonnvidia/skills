@@ -27,35 +27,23 @@ The CLI runs through `npx` and prompts you to choose a skill and install destina
 
 The skill is available the next time your agent loads skills and encounters a relevant task. For example, ask your agent to "solve a linear programming problem with cuOpt" and the skill guides it through the cuOpt Python API.
 
-> **Default scope vs. full catalog.** The bare command above lists the **curated NVIDIA plugin** — the same 3-skill bundle published to the OpenAI and Anthropic plugin marketplaces (`cuopt-install`, `cuopt-numerical-optimization-api-python`, `nemoclaw-user-get-started`). To install any of the additional skills shown in the [Skill Catalog](#skill-catalog) below, append `--full-depth` so the CLI also walks the nested `skills/<Product>/<skill>/` tree. See [Install Any Skill from the Full Catalog](#install-any-skill-from-the-full-catalog).
+> **Why `--full-depth`?** The named-skill examples below all pass `--full-depth` so the CLI walks the full `skills/<Product>/<skill>/` tree. This guarantees the command works for any skill in the [Skill Catalog](#skill-catalog), regardless of which skills happen to be bundled in the curated NVIDIA plugin (the small subset published to the OpenAI and Anthropic plugin marketplaces). The bare `npx skills add nvidia/skills` shown above intentionally omits the flag — that flow is what users see when they install the curated plugin from those marketplaces, and we keep it as-is here for parity.
 
 ### Install One Skill Without Prompts
 
 Use this when you already know the skill name and want to skip prompts.
 
 ```bash
-npx skills add nvidia/skills --skill cuopt-numerical-optimization-api-python --yes
+npx skills add nvidia/skills --skill cuopt-numerical-optimization-api-python --yes --full-depth
 ```
 
-This works as-is for the three curated skills listed above. For any other skill from the [Skill Catalog](#skill-catalog), add `--full-depth` (see [next section](#install-any-skill-from-the-full-catalog)).
-
-### Install Any Skill from the Full Catalog
-
-The catalog table below lists every NVIDIA skill mirrored into this repo. To install one, point the CLI at the full tree with `--full-depth`:
-
-```bash
-npx skills add nvidia/skills --skill <skill-name> --yes --full-depth
-```
-
-For example:
+Replace `cuopt-numerical-optimization-api-python` with any skill name from the [Skill Catalog](#skill-catalog). For example:
 
 ```bash
 npx skills add nvidia/skills --skill cudaq-guide --yes --full-depth
 npx skills add nvidia/skills --skill perf-cuda-graphs --yes --full-depth
 npx skills add nvidia/skills --skill rag-blueprint --yes --full-depth
 ```
-
-Replace `<skill-name>` with any skill name from the [Skill Catalog](#skill-catalog).
 
 ### Install for a Specific Agent
 
@@ -64,25 +52,25 @@ Use `--agent` to target a specific AI coding agent. These are common client targ
 **Claude Code**
 
 ```bash
-npx skills add nvidia/skills --skill cuopt-numerical-optimization-api-python --agent claude-code
+npx skills add nvidia/skills --skill cuopt-numerical-optimization-api-python --agent claude-code --full-depth
 ```
 
 **Codex**
 
 ```bash
-npx skills add nvidia/skills --skill cuopt-numerical-optimization-api-python --agent codex
+npx skills add nvidia/skills --skill cuopt-numerical-optimization-api-python --agent codex --full-depth
 ```
 
 **Cursor**
 
 ```bash
-npx skills add nvidia/skills --skill cuopt-numerical-optimization-api-python --agent cursor
+npx skills add nvidia/skills --skill cuopt-numerical-optimization-api-python --agent cursor --full-depth
 ```
 
 **Kiro**
 
 ```bash
-npx skills add nvidia/skills --skill cuopt-numerical-optimization-api-python --agent kiro-cli
+npx skills add nvidia/skills --skill cuopt-numerical-optimization-api-python --agent kiro-cli --full-depth
 ```
 
 Use `--agent` more than once to install the same skill into multiple agents.
@@ -93,7 +81,8 @@ npx skills add nvidia/skills \
   --agent claude-code \
   --agent codex \
   --agent cursor \
-  --agent kiro-cli
+  --agent kiro-cli \
+  --full-depth
 ```
 
 ### Browse the Catalog
