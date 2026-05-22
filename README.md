@@ -20,7 +20,7 @@ Skills are portable instruction sets that teach AI agents how to use NVIDIA CUDA
 Install NVIDIA skills with the default [`skills` CLI](https://github.com/vercel-labs/skills) flow:
 
 ```bash
-npx skills add nvidia/skills
+npx skills add nvidia/skills --full-depth
 ```
 
 The CLI runs through `npx` and prompts you to choose a skill and install destination. You do not need to clone this repo or copy skill folders by hand.
