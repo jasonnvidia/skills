@@ -1,7 +1,7 @@
 {
-    "name": "nvidia-skills",
+    "name": "nvidia-official",
     "interface": {
-        "displayName": "NVIDIA Skills"
+        "displayName": "NVIDIA Official"
     },
     "plugins": [
         {
