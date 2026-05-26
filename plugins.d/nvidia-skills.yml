@@ -26,6 +26,7 @@ default_prompts:
 # selected by `skill_files:` (defined in plugins.d/_defaults.yml).
 include_skills:
   - skills/cuopt/cuopt-routing-api-python/
+  - skills/cuopt/cuopt-user-rules/
 
 # Override default (`copy`) → ship symlinks to ../../../skills/<...>/.
 # No duplicated SKILL.md, plugin tree stays in sync automatically.
