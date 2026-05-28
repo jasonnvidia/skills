@@ -7,8 +7,9 @@
         {
             "name": "nvidia-skills",
             "source": {
-                "source": "local",
-                "path": "./"
+                "source": "url",
+                "url": "https://github.com/jasonnvidia/skills.git",
+                "ref": "feat/single-plugin-marketplace"
             },
             "policy": {
                 "installation": "AVAILABLE",
