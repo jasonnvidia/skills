@@ -14,11 +14,7 @@
         "agent-skills",
         "gpu"
     ],
-    "skills": [
-        "./skills/cuopt/cuopt-numerical-optimization-api-python",
-        "./skills/cuopt/cuopt-install",
-        "./skills/NemoClaw/nemoclaw-user-get-started"
-    ],
+    "skills": "./skills/",
     "interface": {
         "displayName": "NVIDIA",
         "shortDescription": "Provide agentic guidance in your NVIDIA related workflows.",
