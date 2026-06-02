@@ -84,6 +84,8 @@ Magnitude-vs-change-shape is intentionally **not** validated. If the builder wri
 
 ## Builder DX
 
+> **Note on current state.** This section describes the steady-state once bot-pushed writeback ships (see [Future Work](#future-work)). Today the sync workflow already auto-applies bumps; contributor PRs run `--check` only, so contributors still run `version-plugins.sh --apply --base origin/main` locally and commit the bump themselves. The version semantics below are identical either way.
+
 ### Existing Skill Content Changed
 
 Builder edits an existing included skill (e.g. `skills/aiq-deploy/SKILL.md`). Automation bumps `z`:
@@ -125,12 +127,18 @@ Automation validates (monotonic, no pre-release, no oversized skip) and respects
 
 ### Builder Override Rule
 
-If the PR already changes YAML `version`, automation never bumps on top of it.
+If the PR already changes YAML `version`, automation never bumps on top of it. Two common shapes:
 
 ```text
-Base version: 1.2.0
-PR adds a skill, sets version to 1.3.0
-Automation: validate, accept, do not bump again.
+Builder knows there's a breaking change automation can't see:
+  Base: 1.2.3
+  PR: small content edit + version: "2.0.0"
+  Automation: validate (monotonic, no pre-release, +1 major OK), accept. No further bump.
+
+Builder is fine letting automation handle it:
+  Base: 1.2.3
+  PR: skill added; version: untouched
+  Automation: classify structural, bump 1.2.3 -> 1.3.0.
 ```
 
 Bad behavior automation explicitly avoids:
@@ -340,3 +348,60 @@ Sources:
 - Codex local update flow: `codex/codex-rs/skills/src/assets/samples/plugin-creator/references/installing-and-updating.md`
 - Codex app-server plugin APIs: `codex/codex-rs/app-server/README.md`
 - Codex plugin store behavior: `codex/codex-rs/core-plugins/src/store.rs`
+
+## Implementation Status & Test Results
+
+Status: **shipped on branch `feat/plugin-versioning`**, three commits:
+
+| Commit | Scope |
+|---|---|
+| `71c0299` | `feat(plugins): per-plugin SemVer with auto-bump tooling` — `version-plugins.py`, `version-plugins.sh`, `_defaults.yml` |
+| `e46bd95` | `feat(ci): wire plugin versioning into sync + validate workflows` — `sync-skills.yml`, `validate-plugins.yml` |
+| `0049abd` | `refactor(versioning): always auto-bump y on structural changes; drop policy/strict mode` — simplified per this PRD |
+
+### Files of record
+
+- `.github/scripts/version-plugins.py` — analyzer + writeback (SemVer parsing, payload hashing, change classification, validation, YAML rewrite via `ruamel.yaml`).
+- `.github/scripts/version-plugins.sh` — wrapper that installs `pyyaml` + `ruamel.yaml` into the runner's user site-packages, then execs the Python script.
+- `.github/workflows/sync-skills.yml` — calls `version-plugins.sh --apply --base HEAD` after the post-sync plugin rebuild, before `create-pull-request`.
+- `.github/workflows/validate-plugins.yml` — calls `version-plugins.sh --check` (read-only). Triggers include `.github/scripts/version-plugins.*` so script changes re-run validation.
+- `plugins.d/_defaults.yml` — `version: "1.0.0"` default. No `version_policy` field (the concept was dropped in `0049abd`).
+
+### CLI surface (final)
+
+```
+version-plugins.py [--apply] [--check] [--base REF] [--only NAME]
+```
+
+`--apply` writes bumps into `plugins.d/<name>.yml` and reruns `build-plugins.py` so generated `plugin.json`s stay in sync. `--check` is read-only and exits 2 if any auto-bump or validation finding is outstanding. `--base` overrides base ref resolution (defaults to `GITHUB_BASE_REF` on PR events, `HEAD~1` on push, `origin/main` locally).
+
+### Smoke test results
+
+Run on the live tree against `origin/main` after the simplification commit (`0049abd`):
+
+| Scenario | Perturbation | Expected | Actual |
+|---|---|---|---|
+| Clean tree | none | no-op | `nvidia-skills 1.0.0 (no payload change)` ✅ |
+| Content-only change | append a line to `plugins/nvidia-skills/skills/aiq-deploy/SKILL.md` | bump z | `1.0.0 → 1.0.1 (content-only change)` ✅ |
+| Structural change | drop `skills/aiq-research/` from `include_skills` in `plugins.d/nvidia-skills.yml` | bump y | `1.0.0 → 1.1.0 (structural change: skills removed: aiq-research)` ✅ |
+| Builder major bump | set `version: "2.0.0"` in `plugins.d/nvidia-skills.yml` | accept | `nvidia-skills 2.0.0 (builder-set version validated)` ✅ |
+| Builder under-bump on structural change | drop a skill AND set `version: "1.0.1"` (would have failed under old strict policy) | accept (reviewer's call) | `nvidia-skills 1.0.1 (builder-set version validated)` ✅ |
+
+All five outcomes matched the rules in this PRD.
+
+### Net code+docs delta from strict → simplified
+
+The simplification commit (`0049abd`) removed 84 lines net:
+
+| File | Delta |
+|---|---|
+| `.github/scripts/version-plugins.py` | -69 |
+| `plugin-versioning-mini-prd.md` | -18 (after rewrites) |
+| `.github/workflows/sync-skills.yml` | -14 |
+| `plugins.d/_defaults.yml` | -9 |
+
+Dropped concepts: `version_policy: auto | manual`, `--auto-structural` flag, magnitude-matches-change validation rule, `PluginAnalysis.policy` field.
+
+### What's not implemented yet
+
+See [Future Work](#future-work). The most important gap: contributor PRs are `--check`-only, so a contributor who edits a skill file has to run `version-plugins.sh --apply --base origin/main` locally and commit the bump themselves. Bot-pushed writeback would close this loop but needs a GitHub App token + fork-PR comment fallback; deferred until the local-run friction is observed in practice.
