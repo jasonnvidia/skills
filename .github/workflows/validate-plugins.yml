@@ -19,6 +19,7 @@ on:
       - ".claude-plugin/marketplace.json"
       - ".agents/plugins/marketplace.json"
       - ".github/scripts/build-plugins.*"
+      - ".github/scripts/version-plugins.*"
       - ".github/workflows/validate-plugins.yml"
   workflow_dispatch:
 
@@ -35,6 +36,12 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          # version-plugins.py materializes the PR's base ref via
+          # `git worktree add`, which needs the base commit to exist
+          # locally. Shallow checkouts only fetch the PR head, so fetch
+          # full history here.
+          fetch-depth: 0
 
       - name: Setup Python
         uses: actions/setup-python@v5
@@ -46,6 +53,15 @@ jobs:
 
       - name: Build plugins and fail on drift
         run: .github/scripts/build-plugins.sh --check
+
+      - name: Versioning policy check
+        run: |
+          # Read-only: fail the PR if a payload change requires a version
+          # bump that the contributor has not applied. The script auto-
+          # resolves the base ref from GITHUB_BASE_REF on pull_request
+          # events, so no --base flag needed here. See plugin-versioning-
+          # mini-prd.md for the policy.
+          .github/scripts/version-plugins.sh --check
 
       # TODO: add upstream CLI validation as a follow-up step.
       #

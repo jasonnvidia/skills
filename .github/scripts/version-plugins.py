@@ -601,14 +601,24 @@ class Plan:
     no_ops: list[PluginAnalysis] = field(default_factory=list)
 
 
-def decide(analysis: PluginAnalysis) -> tuple[str, str | None]:
+def decide(
+    analysis: PluginAnalysis,
+    auto_structural: bool = False,
+) -> tuple[str, str | None]:
     """Return (verdict, payload) for one plugin.
 
     verdict ∈ {'noop', 'bump', 'accept', 'fail'}
       noop    -> nothing changed, nothing to do.
-      bump    -> auto-bump z; payload is the new SemVer string.
+      bump    -> auto-bump z (or y, if structural + auto_structural).
+                 Payload is the new SemVer string.
       accept  -> builder already changed version; validated OK.
       fail    -> validation/policy failure; payload is the message.
+
+    `auto_structural` opts into auto-bumping y for structural changes
+    instead of failing. The default (False) matches the PRD's rule:
+    structural changes need a builder decision. Sync workflows pass
+    True because the human PR reviewer is the effective "builder" and
+    the PR has to exist before they can intervene.
     """
     if analysis.builder_changed_version:
         findings = validate_builder_version(
@@ -622,6 +632,13 @@ def decide(analysis: PluginAnalysis) -> tuple[str, str | None]:
         return "noop", None
 
     if analysis.change_kind == ChangeKind.STRUCTURAL:
+        if auto_structural and analysis.policy == "auto":
+            new = SemVer(
+                analysis.head_version.major,
+                analysis.head_version.minor + 1,
+                0,
+            )
+            return "bump", str(new)
         msg = (
             f"structural change requires builder-owned x or y bump; "
             f"current version {analysis.head_version}. Reasons: "
@@ -640,10 +657,13 @@ def decide(analysis: PluginAnalysis) -> tuple[str, str | None]:
     return "bump", str(analysis.head_version.bump_patch())
 
 
-def build_plan(analyses: list[PluginAnalysis]) -> Plan:
+def build_plan(
+    analyses: list[PluginAnalysis],
+    auto_structural: bool = False,
+) -> Plan:
     plan = Plan()
     for a in analyses:
-        verdict, payload = decide(a)
+        verdict, payload = decide(a, auto_structural=auto_structural)
         if verdict == "noop":
             plan.no_ops.append(a)
         elif verdict == "bump":
@@ -671,10 +691,12 @@ def print_plan(plan: Plan, apply_mode: bool) -> None:
         verb = "applying" if apply_mode else "would apply"
         print(f"── auto-bumps ({len(plan.bumps)}) — {verb} ──")
         for a, new in plan.bumps:
-            print(
-                f"  > {a.name}: {a.head_version} -> {new}  "
-                f"(content-only change, policy=auto)"
+            reason = (
+                "structural change, --auto-structural"
+                if a.change_kind == ChangeKind.STRUCTURAL
+                else "content-only change, policy=auto"
             )
+            print(f"  > {a.name}: {a.head_version} -> {new}  ({reason})")
     if plan.findings:
         print(f"── findings ({len(plan.findings)}) — builder action needed ──")
         for f in plan.findings:
@@ -704,6 +726,17 @@ def main(argv: list[str]) -> int:
         "--check",
         action="store_true",
         help="Exit non-zero if any plugin needs a builder decision. No writes.",
+    )
+    p.add_argument(
+        "--auto-structural",
+        action="store_true",
+        help=(
+            "Auto-bump y on structural changes instead of failing. "
+            "Default behavior follows the PRD (structural changes need "
+            "a builder decision). Use this in machine-driven flows where "
+            "the PR reviewer is the effective builder (e.g. the daily "
+            "skill sync, where compliance drops can remove skills)."
+        ),
     )
     args = p.parse_args(argv)
 
@@ -740,7 +773,7 @@ def main(argv: list[str]) -> int:
             if a is not None:
                 analyses.append(a)
 
-    plan = build_plan(analyses)
+    plan = build_plan(analyses, auto_structural=args.auto_structural)
     print_plan(plan, apply_mode=args.apply)
 
     if args.apply and plan.bumps:

@@ -96,6 +96,14 @@ Whenever automation runs in `auto` mode and the PR already changed YAML `version
 
 In `manual` mode, automation runs the same validations but never writes a new version itself; it reports findings and exits non-zero when payload changed without a `version` change.
 
+### Machine-driven contexts (`--auto-structural`)
+
+The strict "structural change requires builder bump" rule assumes a human is authoring the PR and can make the decision before CI runs. The daily skill sync is different: skills can be added or removed by upstream renames, compliance drops, or product moves, and there is no human in the loop until the sync PR exists.
+
+For machine-driven flows, automation runs with `--auto-structural`, which downgrades structural-change-without-bump from a failure to a y-bump. The PR reviewer is the effective builder: they see the structural change *and* its y-bump in one diff and can accept, override, or close.
+
+`--auto-structural` is off by default. Only the sync workflow uses it. Contributor PRs run without the flag so the strict rule still applies.
+
 ## Builder DX
 
 ### Existing Skill Content Changed
