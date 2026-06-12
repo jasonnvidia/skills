@@ -7,14 +7,18 @@ This benchmark summarizes 3-Tier Evaluation from NVSkills-Eval results for the s
 ## Evaluation Summary
 
 - Skill: `vss-deploy-profile`
-- Evaluation date: 2026-05-29
+- Evaluation date: 2026-06-11
 - NVSkills-Eval profile: `external`
+- Environment: `astra-sandbox`
+- Dataset: 5 evaluation tasks
+- Attempts per task: 1
+- Pass threshold: 50%
 - Overall verdict: PASS
-- Tier 3 live agent evaluation: not available in this report
 
 ## Agents Used
 
-- Tier 3 agent details were not available in this report.
+- `claude-code`
+- `codex`
 
 ## Metrics Used
 
@@ -28,35 +32,48 @@ Reported benchmark dimensions:
 
 Underlying evaluation signals used in this run:
 
-- No Tier 3 evaluation signal details were available in this report.
+- `security` (Security): checks for unsafe operations, secret leakage, and unauthorized access.
+- `skill_execution` (Skill Execution): verifies that the agent loaded the expected skill and workflow.
+- `skill_efficiency` (Efficiency): checks routing quality, decoy avoidance, and redundant tool usage.
+- `accuracy` (Accuracy): grades final-answer correctness against the reference answer.
+- `goal_accuracy` (Goal Accuracy): checks whether the overall user task completed successfully.
+- `behavior_check` (Behavior Check): verifies expected behavior steps, including safety expectations.
+- `token_efficiency` (Token Efficiency): compares token usage with and without the skill.
 
 ## Test Tasks
 
-Tier 3 evaluation task details were not available in this report.
+The benchmark dataset contained 5 evaluation tasks:
+
+- Positive tasks: 5 tasks where the skill was expected to activate.
+- Negative tasks: 0 tasks where no skill was expected.
+- Unlabeled tasks: 0 tasks where positive/negative intent could not be inferred.
+
+Task composition is derived from the evaluation dataset when possible. Entries with `expected_skill` set are treated as positive skill-activation cases, while entries with `expected_skill: null` are treated as negative activation cases.
 
 ## Results
 
-Tier 3 dimension rollup was not available in this report.
+| Dimension | Num | `claude-code` | `codex` |
+|---|---:|---:|---:|
+| Security | 5 | 100% (+0%) | 90% (-10%) |
+| Correctness | 5 | 96% (+64%) | 75% (+38%) |
+| Discoverability | 5 | 94% (+49%) | 79% (+24%) |
+| Effectiveness | 5 | 67% (+61%) | 51% (+44%) |
+| Efficiency | 5 | 77% (+39%) | 71% (+23%) |
+
+Score values show skill-assisted performance. Values in parentheses show uplift versus the no-skill baseline when baseline data is available.
 
 ## Tier 1: Static Validation Summary
 
-Tier 1 validation passed with observations. NVSkills-Eval ran 9 checks and found 4 total findings.
+Tier 1 validation passed with observations. NVSkills-Eval ran 1 checks and found 2 total findings.
 
 Top findings:
 
-- MEDIUM QUALITY/quality_correctness: SKILL_SPEC recommended field missing: 'metadata.author' (`skills/vss-deploy-profile/SKILL.md`)
-- MEDIUM QUALITY/quality_efficiency: Deeply nested references in alerts.md (`skills/vss-deploy-profile/SKILL.md`)
+- MEDIUM SCHEMA/body_recommended_section: Missing recommended section: '## Examples' (`skills/vss-deploy-profile/SKILL.md`)
 - MEDIUM SCHEMA/author_missing: Author not specified in metadata (`skills/vss-deploy-profile/SKILL.md`)
-- LOW QUALITY/quality_efficiency: Non-descriptive filename: ngc.md (`skills/vss-deploy-profile/SKILL.md`)
 
 ## Tier 2: Deduplication Summary
 
-Tier 2 validation passed. NVSkills-Eval ran 2 checks and found 0 total findings.
-
-Notable observations:
-
-- Context Deduplication: Collected 20 file(s)
-- Inter-Skill Deduplication: Parsed skill 'vss-deploy-profile': 176 char description
+This tier was not run or did not produce findings in this report.
 
 ## Publication Recommendation
 

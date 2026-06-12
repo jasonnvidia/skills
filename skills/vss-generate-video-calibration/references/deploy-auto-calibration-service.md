@@ -155,8 +155,16 @@ PORT=$(grep ^VSS_AUTO_CALIBRATION_PORT deploy/docker/industry-profiles/warehouse
 UI_PORT=$(grep ^VSS_AUTO_CALIBRATION_UI_PORT deploy/docker/industry-profiles/warehouse-operations/.env | cut -d= -f2)
 HOST_IP=$(hostname -I | awk '{print $1}')
 
-# MS ready
-curl -sf "http://localhost:${PORT:-8010}/v1/ready"
+# MS ready (cold pulls can take a bit after compose returns)
+READY_URL="http://localhost:${PORT:-8010}/v1/ready"
+for i in $(seq 1 24); do
+  if curl -sf "$READY_URL"; then
+    break
+  fi
+  echo "Waiting for AMC microservice readiness... ($i/24)"
+  sleep 5
+done
+curl -sf "$READY_URL"
 # Expected: {"code":0,"message":"VSS Auto Calibration Microservice is ready"}
 
 # UI reachable
@@ -187,7 +195,14 @@ mkdir -p "$PROJECTS_DIR"
 DEST=$(docker inspect vss-auto-calibration \
   --format '{{range .Mounts}}{{println .Source .Destination}}{{end}}' \
   | awk -v s="$PROJECTS_DIR" '$1==s {print $2}')
-DEST=${DEST:-/home/auto-calibration-ms/server/projects}
+if [ -z "$DEST" ]; then
+  WORKDIR=$(docker inspect vss-auto-calibration --format "{{.Config.WorkingDir}}")
+  if [ -z "$WORKDIR" ]; then
+    echo "ERROR: could not determine container working directory — is vss-auto-calibration running?" >&2
+    exit 1
+  fi
+  DEST="${WORKDIR%/}/projects"
+fi
 
 docker exec vss-auto-calibration sh -c \
   "touch '$DEST/.amc_write_test' && rm -f '$DEST/.amc_write_test'" \
@@ -195,7 +210,7 @@ docker exec vss-auto-calibration sh -c \
   || echo "projects directory is not writable by the container — apply the ACL below"
 ```
 
-> The container WorkingDir is `/home/auto-calibration-ms/server` and the projects dir mounts at `…/server/projects`, so a workdir-relative `server/projects` is wrong (it resolves to `server/server/projects` → "No such file or directory", which masks a real permission failure). Resolving the mount destination from `docker inspect` avoids this entirely.
+> The projects dir mounts under the container working directory. Use the mount destination resolved from `docker inspect`; a workdir-relative path with the working-directory basename prefixed can resolve to a nested non-existent path and mask a permission failure.
 
 If the write test does not succeed (the common case on a fresh host — see above), grant the container user access with a narrow ACL (ask the user before changing host permissions). This adds write access for UID 1000 only and leaves existing ownership intact:
 

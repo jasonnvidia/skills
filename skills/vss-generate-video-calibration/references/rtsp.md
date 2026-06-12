@@ -10,7 +10,7 @@ For local MP4s instead, see `videos.md`. For verifying the install with the bund
 - **MS knows where VIOS is** — `VIOS_BASE_URL` is set in the MS container's environment (auto-wired from `${VST_INTERNAL_URL}` under `bp_wh_*` blueprints; otherwise set explicitly in [`deploy/docker/industry-profiles/warehouse-operations/.env`](../../../deploy/docker/industry-profiles/warehouse-operations/.env)). Required at runtime; Step 1 only uses the 30888 probe to detect whether VIOS is up locally.
 - **RTSP URLs reachable from the VIOS host** — verify with the user before starting capture.
 
-The shared prerequisites (AMC microservice, Python+requests) come from the SKILL.md [Prerequisites](../SKILL.md#prerequisites-shared-across-modes) section.
+The shared prerequisites (AMC microservice, Python+requests) come from the SKILL.md [Prerequisites](../SKILL.md#prerequisites-shared-across-calibration-modes) section.
 
 ## Step 1 — Verify VIOS Is Reachable
 
@@ -81,14 +81,15 @@ UI fallback details for any of these live in [SKILL.md UI Fallback Pattern](../S
 
 ### Optional
 7. **`sensor_id`** per stream — if VIOS already has the sensor registered, pass the ID to skip re-registration. Leave null and the MS auto-registers via VIOS.
-8. **Ground truth zip** (`GT.zip`), **focal lengths**, **VGGT flag** — same options as the videos mode.
+8. **Ground truth zip** (`GT.zip`) and **focal lengths** — same options as the videos mode.
+
+VGGT refinement is handled after AMC completes by [SKILL.md Step E](../SKILL.md#step-e--vggt-refinement). Do not collect a separate RTSP-mode VGGT flag; staging the model is optional during deployment, and missing VGGT must not block the AMC run.
 
 For nvstreamer setup details and sensor pre-registration, see your VIOS deployment docs.
 
-## Step 3 — Create Project
+## Step 3 — Initialize RTSP Run
 
-See [`common-steps.md` § Create project](common-steps.md#create-project) for the
-endpoint shape. Save the returned `project_id`.
+Before capture, allocate an AMC project using [`common-steps.md`](common-steps.md#create-project). The RTSP capture request uses that `project_id`.
 
 ## Step 4 — Start RTSP Capture
 
@@ -160,16 +161,16 @@ UI fallback details — see [SKILL.md UI Fallback Pattern](../SKILL.md#ui-fallba
 
 ## Step 7 — Hand off to the Shared Calibration Tail
 
-See [`common-steps.md` § Hand off](common-steps.md#hand-off-to-the-shared-calibration-tail).
+Continue with [SKILL.md Step A onward](../SKILL.md#step-a--verify-project) (verify → calibrate → poll → results). Use [`calibration-tail.md`](calibration-tail.md) for the shared Python snippet; [`common-steps.md` § Hand off](common-steps.md#hand-off-to-the-shared-calibration-tail) has the reusable handoff note.
 
 ---
 
-## Complete Python Script
+## RTSP Mode Python Script
 
 ```python
+from pathlib import Path
 import os
 import time
-from pathlib import Path
 
 import requests
 
@@ -216,7 +217,7 @@ LAYOUT_PNG     = _resolve_local(LAYOUT_PNG,     ["layout.png"],           _scan_
 
 s = requests.Session()
 
-# Step 3 — Create project
+# Open an RTSP calibration project
 r = s.post(f"{BASE_URL}/create_project", data={"project_name": PROJECT_NAME})
 r.raise_for_status()
 project_id = r.json()["project_id"]
@@ -296,8 +297,7 @@ if FOCAL_LENGTHS:
 # RTSP difference: videos are already ingested from the RTSP capture, so in UI
 # Step 2 (Video Configuration) upload layout.png ONLY — do not re-upload videos.
 
-# Step A/B/C/D — see references/calibration-tail.md for the shared snippet
-# (verify_project → calibrate → poll get_project_info → fetch evaluation_statistics)
+# Run the shared tail now; see Step 7 above.
 ```
 
 ## Mode-specific Troubleshooting
