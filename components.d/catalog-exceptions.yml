@@ -1,0 +1,25 @@
+# Catalog exceptions — skills/ dirs allowed to exist WITHOUT a
+# components.d registration. Everything else in skills/ must be declared
+# by a components.d/<slug>.yml entry, or the hourly sync prunes it
+# (see .github/scripts/prune-orphans.sh).
+#
+# Add an entry only with a documented reason and an owner.
+exceptions:
+  - dir: cuopt-developer
+    reason: Contributor-facing skill, intentionally uncataloged (per cuOpt team, 2026-06-01)
+    owner: rgsl888prabhu
+  - dir: omniverse-cad-to-simready
+    reason: Physical AI Hub skill, manually curated outside the sync workflow
+    owner: alex-qi
+  - dir: omniverse-realtime-viewer
+    reason: Physical AI Hub skill, manually curated outside the sync workflow
+    owner: alex-qi
+  - dir: omniverse-usd-performance-tuning
+    reason: Physical AI Hub skill, manually curated outside the sync workflow
+    owner: alex-qi
+  - dir: physical-ai-infrastructure-setup-and-resilient-scaling
+    reason: Physical AI Hub skill, manually curated outside the sync workflow
+    owner: alex-qi
+  - dir: physical-ai-neural-reconstruction
+    reason: Physical AI Hub skill, manually curated outside the sync workflow
+    owner: alex-qi

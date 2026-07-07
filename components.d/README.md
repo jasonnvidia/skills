@@ -83,3 +83,7 @@ yq ea '[.] | {"components": .}' components.d/*.yml > /tmp/components.aggregated.
 ```
 
 Then iterates the resulting `components` list. Files are read in alphabetical order; the README regenerator sorts the result by display name independently.
+
+## Removal and orphan pruning
+
+Removing a skill entry from a component file removes its `skills/<catalog_dir>/` copy from the catalog on the next sync — the sync's orphan-pruning step (`.github/scripts/prune-orphans.sh`) deletes any top-level `skills/` dir with no `components.d` registration. Dirs that intentionally exist without a registration (e.g. contributor-facing or manually curated skills) must be listed in `catalog-exceptions.yml` in this directory, with a reason and owner. Pruning is skipped for the whole run if any component file fails to parse, and refuses to act (flagging for human triage instead) if more than 5 dirs would be removed at once.

@@ -354,6 +354,19 @@ jobs:
             done < "$dropped"
           fi
 
+      - name: Prune orphaned skill dirs
+        # Remove skills/ dirs whose components.d registration was removed.
+        # Teams consistently assume deregistering also removes the catalog
+        # copy (Dynamo, TAO, cuOpt all hit this) — this step makes that
+        # true. Capped + parse-guarded; see the script header for the
+        # safety rails, and components.d/catalog-exceptions.yml for dirs
+        # that are intentionally unregistered.
+        run: |
+          bash .github/scripts/prune-orphans.sh
+          if [ -s /tmp/pruned-orphans.txt ]; then
+            echo "- orphan pruning" >> /tmp/changed-components.txt
+          fi
+
       - name: Resolve skill contacts
         # For each dropped/reverted skill, resolve the original onboarder
         # via git blame on the owning components.d/<slug>.yml and emit a
@@ -844,6 +857,20 @@ jobs:
                   emit_with_contact "$dir" "$reason"
                 done
               fi
+            fi
+            if [ -s /tmp/pruned-orphans.txt ]; then
+              echo ""
+              echo "**Pruned — deregistered from components.d (dir removed from catalog):**"
+              while read -r dir; do
+                echo "- \`skills/$dir\`"
+              done < /tmp/pruned-orphans.txt
+            fi
+            if [ -s /tmp/pruned-orphans-overflow.txt ]; then
+              echo ""
+              echo "**⚠ Orphan pruning skipped — count exceeds safety cap; needs human triage:**"
+              while read -r dir; do
+                echo "- \`skills/$dir\`"
+              done < /tmp/pruned-orphans-overflow.txt
             fi
             if [ -s /tmp/failed-components.txt ]; then
               echo ""
