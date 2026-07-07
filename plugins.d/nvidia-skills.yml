@@ -1,6 +1,6 @@
 name: nvidia-skills
 
-version: "1.1.2"
+version: "1.2.0"
 description: Skills for NVIDIAs ecosystem spans GPU acceleration, CUDA, AI agents, inference, robotics, Physical AI, Omniverse, and simulation. This plugin helps you understand the pieces, choose a path, validate your setup, and build practical NVIDIA-powered workflows.
 
 display_name: NVIDIA
@@ -53,7 +53,7 @@ include_skills:
   - skills/omniverse-usd-performance-tuning/
   - skills/omniverse-realtime-viewer/
   # cuOpt
-  - skills/cuopt-numerical-optimization-api-python/
+  - skills/cuopt-numerical-optimization-api/
   # DALI
   - skills/dali-dynamic-mode/
 
