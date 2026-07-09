@@ -1,7 +1,7 @@
 {
   "schema_version": 2,
   "source": "skills/*/BENCHMARK.md",
-  "skill_count": 229,
+  "skill_count": 230,
   "result_row_count": 2070,
   "skills_without_results": [
     "deepstream-generate-pipeline",
@@ -18,6 +18,7 @@
     "mcore-run-on-slurm",
     "mcore-split-pr",
     "mcore-testing",
+    "nvidia-skill-finder",
     "omniverse-cad-to-simready",
     "omniverse-realtime-viewer",
     "omniverse-usd-performance-tuning",
@@ -2469,6 +2470,21 @@
       "component": "Medical AI Skills",
       "has_results": true,
       "average_uplift_pct": 29.5
+    },
+    {
+      "skill": "skill",
+      "evaluation_date": "2026-06-25",
+      "profile": "external",
+      "environment": null,
+      "tasks": null,
+      "attempts_per_task": null,
+      "pass_threshold_pct": null,
+      "verdict": "PASS",
+      "agents": [],
+      "catalog_dir": "nvidia-skill-finder",
+      "component": "NVIDIA Skills",
+      "has_results": false,
+      "average_uplift_pct": null
     },
     {
       "skill": "omniverse-cad-to-simready",
